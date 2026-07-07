@@ -1,0 +1,107 @@
+<template>
+    <lightning-card title="Property Management System" icon-name="custom:custom24">
+        <div class="slds-p-around_medium">
+            
+            <!-- REQUIREMENT 3: Standard Creation Form Section with Upload Guards -->
+            <lightning-accordion active-section-name="creationForm">
+                <lightning-accordion-section name="creationForm" label="Create New Property (Image Required)">
+                    <div class="slds-grid slds-wrap slds-gutter_small">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-input label="Property Name" data-id="propName" required></lightning-input>
+                            <lightning-input label="Address" data-id="address" required></lightning-input>
+                            <lightning-input label="City" data-id="city" required></lightning-input>
+                            <lightning-input label="State" data-id="state" required></lightning-input>
+                            <lightning-input label="Postal Code" data-id="zip" required></lightning-input>
+                            <lightning-input label="Country" data-id="country" required></lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                            <lightning-combobox label="Type" options={typeOptions} data-id="type" required></lightning-combobox>
+                            <lightning-combobox label="Furnishing Status" options={furnishingOptions} data-id="furnishing" required></lightning-combobox>
+                            <lightning-combobox label="Availability Status" options={statusOptionsWithoutAll} data-id="status" required></lightning-combobox>
+                            <lightning-input type="number" label="Rent Amount" data-id="rent" required></lightning-input>
+                            <lightning-textarea label="Property Description" data-id="desc" required></lightning-textarea>
+                            
+                            <div class="slds-box slds-m-top_medium slds-theme_shade">
+                                <lightning-file-upload
+                                    label="Attach Property Images"
+                                    accept={acceptedFormats}
+                                    onuploadfinished={handleUploadFinished}
+                                    multiple>
+                                </lightning-file-upload>
+                                <p class="slds-text-color_success slds-m-top_x-small slds-font-weight_bold">
+                                    Attached Documents Count: {uploadedFileIds.length}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-m-top_medium">
+                        <lightning-button variant="brand" label="Save & Geocode Record" onclick={saveProperty}></lightning-button>
+                    </div>
+                </lightning-accordion-section>
+            </lightning-accordion>
+
+            <div class="slds-m-vertical_large" style="border-top: 2px dashed #dddddd;"></div>
+
+            <!-- REQUIREMENT 2.b: Complex Multi-Parameter Query Custom Filters Dashboard panel -->
+            <div class="slds-box slds-theme_shade slds-m-bottom_medium">
+                <h3 class="slds-text-heading_small slds-m-bottom_small slds-font-weight_bold">Filter Properties</h3>
+                <div class="slds-grid slds-wrap slds-gutter_small">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                        <lightning-input type="number" label="Max Price Filter" onchange={handleFilterChange} data-field="maxPrice"></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                        <lightning-combobox label="Availability Status" options={statusOptionsWithAll} onchange={handleFilterChange} data-field="status" value=""></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                        <lightning-combobox label="Furnishing Status" options={furnishingOptionsWithAll} onchange={handleFilterChange} data-field="furnishingStatus" value=""></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                        <lightning-input type="number" label="Nearby Range (KM)" onchange={handleFilterChange} data-field="distanceKm"></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5 slds-p-top_large">
+                        <lightning-button label="Fetch My Location" variant="neutral" onclick={fetchBrowserCoordinates} icon-name="utility:location"></lightning-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REQUIREMENT 2 & 4: Split Datatable List Framework and Mapping Display Viewports -->
+            <div class="slds-grid slds-wrap slds-gutter_medium">
+                <!-- 25-record dynamic table segment container -->
+                <div class="slds-col slds-size_1-of-1 slds-large-size_3-of-5">
+                    <div style="height: 380px;">
+                        <lightning-datatable
+                            key-field="Id"
+                            data={propertiesList}
+                            columns={columns}
+                            max-row-selection="1"
+                            onrowselection={handleRowSelection}>
+                        </lightning-datatable>
+                    </div>
+                    
+                    <!-- Server-Side Pagination Pagination Controls UI -->
+                    <div class="slds-m-top_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-box slds-theme_shade">
+                        <lightning-button label="◄ Previous Page" onclick={handlePrevPage} disabled={isFirstPage} variant="neutral"></lightning-button>
+                        <span class="slds-text-title_bold">Page {pageNumber} of {totalPages} (Total Records Found: {totalRecords})</span>
+                        <lightning-button label="Next Page ►" onclick={handleNextPage} disabled={isLastPage} variant="neutral"></lightning-button>
+                    </div>
+                </div>
+
+                <!-- REQUIREMENT 4: Dynamic Record Map Component Canvas View -->
+                <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-5">
+                    <div class="slds-box slds-theme_default" style="height: 440px;">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small slds-font-weight_bold">Geocoded Mapping Target</h3>
+                        <template if:true={mapMarkers.length}>
+                            <lightning-map map-markers={mapMarkers} zoom-level="15" style="height: 370px; display: block;"></lightning-map>
+                        </template>
+                        <template if:false={mapMarkers.length}>
+                            <div class="slds-align_absolute-center" style="height: 370px; background: #fdfdfd; border: 1px dashed #cccccc; border-radius: 4px;">
+                                <p class="slds-text-color_weak">Select a specific row record item to review geocoded map positions.</p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </lightning-card>
+</template>

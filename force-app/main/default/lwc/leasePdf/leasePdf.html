@@ -1,0 +1,44 @@
+<template>
+    <lightning-card title="Lease Agreement Document Actions" icon-name="standard:service_contract">
+        <div class="slds-p-around_medium">
+            
+            <!-- Structural state confirmation check blocks -->
+            <template if:true={leaseRecord}>
+                <div class="slds-text-align_center slds-p-bottom_small">
+                    <p class="slds-text-heading_small">
+                        Manage document assets for agreement: <strong>{leaseRecord.Name}</strong>
+                    </p>
+                    <p class="slds-text-color_weak slds-p-top_xx-small">
+                        Target Tenant Email Registered: {leaseRecord.Tenant__r.Email__c}
+                    </p>
+                </div>
+
+                <!-- Action Button Matrix Row Layout Configurations -->
+                <div class="slds-align_absolute-center slds-p-top_small">
+                    <lightning-button 
+                        variant="brand" 
+                        label="Download PDF" 
+                        icon-name="utility:download" 
+                        onclick={handleDownloadPdf} 
+                        class="slds-m-right_small">
+                    </lightning-button>
+
+                    <lightning-button 
+                        variant="brand-outline" 
+                        label="Send PDF to Tenant" 
+                        icon-name="utility:email" 
+                        onclick={handleEmailPdf}>
+                    </lightning-button>
+                </div>
+            </template>
+
+            <!-- Loading Spinner Fallback Block -->
+            <template if:false={leaseRecord}>
+                <div class="slds-align_absolute-center slds-p-around_medium">
+                    <lightning-spinner alt="Loading lease layout data..." size="small" variant="brand"></lightning-spinner>
+                </div>
+            </template>
+            
+        </div>
+    </lightning-card>
+</template>

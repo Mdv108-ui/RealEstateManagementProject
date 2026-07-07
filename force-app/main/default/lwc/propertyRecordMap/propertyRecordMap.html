@@ -1,0 +1,16 @@
+<template>
+    <lightning-card title="Property Location">
+        <template if:true={hasLocation}>
+            <lightning-map
+                map-markers={mapMarkers}
+                zoom-level={zoomLevel}>
+            </lightning-map>
+        </template>
+
+        <template if:false={hasLocation}>
+            <div class="slds-p-around_medium">
+                Location is not available yet.
+            </div>
+        </template>
+    </lightning-card>
+</template>

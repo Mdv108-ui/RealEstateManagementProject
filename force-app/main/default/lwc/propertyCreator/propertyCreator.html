@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Create Property">
+        <div class="slds-p-around_medium">
+
+            <lightning-input label="Property Name" onchange={handleName}></lightning-input>
+            <lightning-input label="Address" required onchange={handleAddress}></lightning-input>
+            <lightning-input label="City" required onchange={handleCity}></lightning-input>
+            <lightning-input label="State" required onchange={handleState}></lightning-input>
+            <lightning-input label="Postal Code" required onchange={handlePostalCode}></lightning-input>
+            <lightning-input label="Country" required onchange={handleCountry}></lightning-input>
+
+            <lightning-combobox label="Type" required options={typeOptions} onchange={handleType}></lightning-combobox>
+            <lightning-combobox label="Furnishing Status" options={furnishingOptions} onchange={handleFurnishing}></lightning-combobox>
+            <lightning-combobox label="Status" required options={statusOptions} onchange={handleStatus}></lightning-combobox>
+
+            <lightning-input label="Rent" type="number" required onchange={handleRent}></lightning-input>
+            <lightning-textarea label="Description" required onchange={handleDescription}></lightning-textarea>
+
+            <lightning-input
+                type="file"
+                label="Upload Property Images"
+                multiple
+                accept="image/*"
+                onchange={handleFiles}>
+            </lightning-input>
+
+            <lightning-button
+                class="slds-m-top_medium"
+                label="Create Property"
+                variant="brand"
+                onclick={saveProperty}>
+            </lightning-button>
+
+        </div>
+    </lightning-card>
+</template>

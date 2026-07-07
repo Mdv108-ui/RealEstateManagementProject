@@ -1,0 +1,19 @@
+<template>
+    <lightning-card title="Tenant Management" icon-name="standard:client">
+        <div class="slds-p-around_medium">
+            <template if:true={tenants}>
+                <lightning-datatable
+                key-field="Id" data={tenants} columns={columns} hide-checkbox-column
+                >
+
+                </lightning-datatable>
+            </template>
+<template if:false={tenants}>
+    <div class="slds-align_absolute-center slds-p-around_large">
+                    <p class="slds-text-heading_small slds-text-color_weak">No tenant registry accounts found in the system database.</p>
+                </div>
+</template>
+
+        </div>
+    </lightning-card>
+</template>
